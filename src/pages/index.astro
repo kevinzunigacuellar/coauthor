@@ -1,5 +1,5 @@
 ---
-
+export const prerender = true
 ---
 
 <html lang="en">
@@ -12,5 +12,6 @@
 	</head>
 	<body>
 		<h1>Astro</h1>
+		<p>Your random value is: {Math.floor(Math.random() * 100) + 1}</p>
 	</body>
 </html>
