@@ -1,7 +1,4 @@
-// @ts-check
-// @ts-check
-import { defineConfig } from "astro/config";
-
+import { defineConfig, envField } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 
 // https://astro.build/config
@@ -11,5 +8,9 @@ export default defineConfig({
       enabled: true,
     },
   }),
-  output: "server",
+  env: {
+    schema: {
+      GH_TOKEN: envField.string({ context: "server", access: "secret" }),
+    },
+  },
 });
