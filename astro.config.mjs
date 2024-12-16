@@ -1,13 +1,9 @@
 import { defineConfig, envField } from "astro/config";
-import cloudflare from "@astrojs/cloudflare";
+import netlify from "@astrojs/netlify";
 
 // https://astro.build/config
 export default defineConfig({
-  adapter: cloudflare({
-    platformProxy: {
-      enabled: true,
-    },
-  }),
+  adapter: netlify(),
   env: {
     schema: {
       GH_TOKEN: envField.string({ context: "server", access: "secret" }),

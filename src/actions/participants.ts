@@ -86,7 +86,6 @@ async function fetchPaginatedParticipants(
       },
     }),
   });
-
   if (!res.ok) {
     throw new ActionError({
       code: "INTERNAL_SERVER_ERROR",
