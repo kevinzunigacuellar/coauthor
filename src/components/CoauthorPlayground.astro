@@ -1,0 +1,122 @@
+<coauthor-playground>
+  <form>
+    <label for="url">GitHub Pull Request</label>
+    <input id="url" required name="url" />
+  </form>
+  <div id="output">Enter a GitHub pull request URL to get its co-authors</div>
+</coauthor-playground>
+<style>
+  coauthor-playground {
+    display: block;
+    width: 100%;
+    max-width: 640px;
+    background: #f5f6f8;
+    border: 1px solid #cdcfd3;
+    padding: 1rem;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    font-size: 0.85rem;
+    line-height: 1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  input {
+    padding-block: 0.25rem;
+    padding-inline: 0.5rem;
+    border: 1px solid #cdcfd3;
+  }
+  #output {
+    border: 1px solid #cdcfd3;
+    background-color: white;
+    user-select: all;
+    font-size: 0.9rem;
+    line-height: 1.625;
+    margin-top: 0.85rem;
+    padding: 0.75rem;
+    overflow: scroll;
+  }
+</style>
+<script>
+  import { actions } from "astro:actions";
+
+  class CoauthorPlayground extends HTMLElement {
+    private form: HTMLFormElement | null;
+    private output: HTMLDivElement | null;
+    private _state: "loading" | "error" | "success" | "init";
+
+    constructor() {
+      super();
+      this.form = this.querySelector("form");
+      this.output = this.querySelector("#output");
+      this._state = "init";
+    }
+
+    get state() {
+      return this._state;
+    }
+
+    set state(newState: "loading" | "error" | "success" | "init") {
+      this._state = newState;
+    }
+
+    private async handleSubmit(e: SubmitEvent) {
+      e.preventDefault();
+
+      const formData = new FormData(this.form!);
+      this.state = "loading";
+      this.renderLoading();
+
+      try {
+        const { error, data } = await actions.getParticipants(formData);
+
+        if (error) {
+          this.state = "error";
+          this.renderError(error.message);
+          return;
+        }
+
+        this.renderData(data.participants);
+        this.state = "success";
+      } catch (err) {
+        this.state = "error";
+        this.renderError("An unexpected error occurred. Please try again.");
+      }
+    }
+
+    private renderLoading() {
+      if (!this.output) return;
+      this.output.textContent = "Loading...";
+    }
+
+    private renderError(message: string) {
+      if (!this.output) return;
+      this.output.textContent = `Error: ${message}`;
+    }
+
+    private renderData(data: string[]) {
+      if (!this.output) return;
+      this.output.textContent = "";
+      const list = document.createElement("ul");
+      for (const participant of data) {
+        const item = document.createElement("li");
+        item.textContent = participant;
+        list.appendChild(item);
+      }
+      this.output.appendChild(list);
+    }
+
+    connectedCallback() {
+      this.form?.addEventListener("submit", this.handleSubmit.bind(this));
+    }
+
+    disconnectedCallback() {
+      this.form?.removeEventListener("submit", this.handleSubmit.bind(this));
+    }
+  }
+
+  customElements.define("coauthor-playground", CoauthorPlayground);
+</script>

@@ -1,5 +1,7 @@
 ---
-
+import "../styles/reset.css";
+import "@fontsource-variable/jetbrains-mono";
+import CoauthorPlayground from "../components/CoauthorPlayground.astro";
 ---
 
 <html lang="en">
@@ -12,96 +14,26 @@
   </head>
   <body>
     <h1>Co-author Generator</h1>
-    <coauthor-playground>
-      <form>
-        <label for="url">GitHub Pull Request</label>
-        <input id="url" required name="url" />
-        <button>Send</button>
-      </form>
-      <div id="output">
-        <p>Enter a GitHub pull request URL to get its co-authors</p>
-      </div>
-    </coauthor-playground>
+    <CoauthorPlayground />
   </body>
 </html>
-<script>
-  import { actions } from "astro:actions";
-
-  class CoauthorPlayground extends HTMLElement {
-    private form: HTMLFormElement | null;
-    private output: HTMLDivElement | null;
-    private submitButton: HTMLButtonElement | null;
-    private _state: "loading" | "error" | "success" | "init";
-
-    constructor() {
-      super();
-      this.form = this.querySelector("form");
-      this.output = this.querySelector("#output");
-      this.submitButton = this.querySelector("button");
-      this._state = "init";
-    }
-
-    get state() {
-      return this._state;
-    }
-
-    set state(newState: "loading" | "error" | "success" | "init") {
-      this._state = newState;
-      this.output?.classList.remove("loading", "error", "success");
-      this.output?.classList.add(newState);
-
-      if (this.submitButton) {
-        this.submitButton.disabled = newState === "loading";
-      }
-    }
-
-    private async handleSubmit(e: SubmitEvent) {
-      e.preventDefault();
-
-      const formData = new FormData(this.form!);
-      this.state = "loading";
-      this.renderLoading();
-
-      try {
-        const { error, data } = await actions.getParticipants(formData);
-
-        if (error) {
-          this.state = "error";
-          this.renderError(error.message);
-          return;
-        }
-
-        this.state = "success";
-        this.renderData(data.participants);
-      } catch (err) {
-        this.state = "error";
-        this.renderError("An unexpected error occurred. Please try again.");
-      }
-    }
-
-    private renderLoading() {
-      if (!this.output) return;
-      this.output.textContent = "Loading...";
-    }
-
-    private renderError(message: string) {
-      if (!this.output) return;
-      this.output.textContent = `Error: ${message}`;
-    }
-
-    private renderData(data: string[]) {
-      if (!this.output) return;
-      this.output.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-    }
-
-    connectedCallback() {
-      this.form?.addEventListener("submit", this.handleSubmit.bind(this));
-    }
-
-    disconnectedCallback() {
-      this.form?.removeEventListener("submit", this.handleSubmit.bind(this));
-    }
+<style>
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    font-family: "JetBrains Mono", monospace;
   }
-
-  customElements.define("coauthor-playground", CoauthorPlayground);
-</script>
+  h1 {
+    font-size: 2rem;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 2rem;
+  }
+  body {
+    padding-block: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>
