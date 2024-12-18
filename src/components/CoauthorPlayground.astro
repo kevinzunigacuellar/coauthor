@@ -3,7 +3,9 @@
     <label for="url">GitHub Pull Request</label>
     <input id="url" required name="url" />
   </form>
-  <div id="output">Enter a GitHub pull request URL to get its co-authors</div>
+  <div id="output" data-state="loading">
+    Enter a GitHub pull request URL to get its co-authors
+  </div>
 </coauthor-playground>
 <style>
   coauthor-playground {
@@ -29,20 +31,33 @@
     padding-inline: 0.5rem;
     border: 1px solid #cdcfd3;
   }
-  #output {
+  div {
     border: 1px solid #cdcfd3;
     background-color: white;
-    user-select: all;
     font-size: 0.9rem;
     line-height: 1.625;
     margin-top: 0.85rem;
-    padding: 0.75rem;
+    padding: 0.5rem;
     overflow: scroll;
+  }
+
+  div[data-state="error"] {
+    color: #dc2626;
+    border-color: #dc2626;
+    background-color: #fee2e2;
+  }
+
+  div[data-state="success"] {
+    user-select: all;
+    color: #2563eb;
+    background-color: #dbeafe;
+    border-color: #2563eb;
   }
 </style>
 <script>
-  import { actions } from "astro:actions";
-
+  import { actions, isInputError } from "astro:actions";
+  // @ts-ignore - canvas-confetti is not typed
+  import confetti from "canvas-confetti";
   class CoauthorPlayground extends HTMLElement {
     private form: HTMLFormElement | null;
     private output: HTMLDivElement | null;
@@ -51,7 +66,7 @@
     constructor() {
       super();
       this.form = this.querySelector("form");
-      this.output = this.querySelector("#output");
+      this.output = this.querySelector("div");
       this._state = "init";
     }
 
@@ -61,6 +76,8 @@
 
     set state(newState: "loading" | "error" | "success" | "init") {
       this._state = newState;
+      if (!this.output) return;
+      this.output.setAttribute("data-state", newState);
     }
 
     private async handleSubmit(e: SubmitEvent) {
@@ -75,12 +92,16 @@
 
         if (error) {
           this.state = "error";
-          this.renderError(error.message);
+          const errorMessage = isInputError(error)
+            ? error.fields.url?.join(", ") ||
+              "An unexpected error occurred. Please try again."
+            : error.message;
+          this.renderError(errorMessage);
           return;
         }
 
-        this.renderData(data.participants);
         this.state = "success";
+        this.renderData(data.participants);
       } catch (err) {
         this.state = "error";
         this.renderError("An unexpected error occurred. Please try again.");
@@ -94,7 +115,7 @@
 
     private renderError(message: string) {
       if (!this.output) return;
-      this.output.textContent = `Error: ${message}`;
+      this.output.textContent = message;
     }
 
     private renderData(data: string[]) {
@@ -107,6 +128,7 @@
         list.appendChild(item);
       }
       this.output.appendChild(list);
+      confetti();
     }
 
     connectedCallback() {

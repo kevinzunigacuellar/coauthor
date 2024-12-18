@@ -20,6 +20,9 @@ importers:
       astro:
         specifier: ^5.0.9
         version: 5.0.9(@types/node@22.10.1)(rollup@4.28.1)(typescript@5.7.2)(yaml@2.6.1)
+      canvas-confetti:
+        specifier: ^1.9.3
+        version: 1.9.3
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
@@ -834,6 +837,9 @@ packages:
   camelcase@8.0.0:
     resolution: {integrity: sha512-8WB3Jcas3swSvjIeA2yvCJ+Miyz5l1ZmB6HFb9R1317dt9LCQoswg/BGrmAmkWVEszSrrg4RwmO46qIm2OEnSA==}
     engines: {node: '>=16'}
+
+  canvas-confetti@1.9.3:
+    resolution: {integrity: sha512-rFfTURMvmVEX1gyXFgn5QMn81bYk70qa0HLzcIOSVEyl57n6o9ItHeBtUSWdvKAPY0xlvBHno4/v3QPrT83q9g==}
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -2836,6 +2842,8 @@ snapshots:
       fill-range: 7.1.1
 
   camelcase@8.0.0: {}
+
+  canvas-confetti@1.9.3: {}
 
   ccount@2.0.1: {}
 

@@ -10,7 +10,9 @@ export const server = {
   getParticipants: defineAction({
     accept: "form",
     input: z.object({
-      url: z.string().url(),
+      url: z.string().url({
+        message: "Invalid URL, please provide a GitHub pull request URL",
+      }),
     }),
     handler: async (input) => {
       const params = parseUrl(input.url);

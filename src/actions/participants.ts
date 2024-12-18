@@ -121,7 +121,7 @@ export function parseUrl(url: string): ParticipantsUrlParams {
   if (inputUrl.hostname !== "github.com") {
     throw new ActionError({
       code: "BAD_REQUEST",
-      message: "Invalid GitHub URL, please provide a valid GitHub pull request",
+      message: "Invalid URL, please provide a GitHub pull request URL",
     });
   }
 
@@ -136,7 +136,7 @@ export function parseUrl(url: string): ParticipantsUrlParams {
   if (!parsedParams.success) {
     throw new ActionError({
       code: "BAD_REQUEST",
-      message: "Invalid GitHub URL, please provide a valid GitHub pull request",
+      message: "Invalid URL, please provide a GitHub pull request URL",
     });
   }
 
